@@ -1,0 +1,66 @@
+name: Deploy DCM
+
+on:
+  push:
+  branches:
+    - '**'
+
+jobs:
+  test-changelog:
+  runs-on: ubuntu-latest
+  services:
+    postgres:
+    image: postgres:15
+    env:
+      POSTGRES_USER: testuser
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_DB: testdb
+    ports:
+      - 5432:5432
+    options: >-
+      --health-cmd="pg_isready -U testuser" 
+      --health-interval=10s 
+      --health-timeout=5s 
+      --health-retries=5
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Wait for Postgres to be ready
+      run: |
+        for i in {1..10}; do
+        pg_isready -h localhost -U testuser && break
+        sleep 3
+        done
+
+    - name: Test changelog on Postgres
+      env:
+        PGUSER: testuser
+        PGPASSWORD: testpass
+        PGHOST: localhost
+        PGDATABASE: testdb
+      run: |
+        # Replace with your changelog test command, e.g. using Liquibase or Flyway
+        echo "Testing changelog..."
+        # Example: liquibase update --url=jdbc:postgresql://localhost:5432/testdb --username=testuser --password=testpass
+
+  deploy-changelog:
+  needs: test-changelog
+  if: github.ref == 'refs/heads/main'
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Deploy changelog to RDS
+      env:
+        # Set your RDS connection details as secrets in GitHub
+        PGUSER: ${{ secrets.RDS_USER }}
+        PGPASSWORD: ${{ secrets.RDS_PASSWORD }}
+        PGHOST: ${{ secrets.RDS_HOST }}
+        PGDATABASE: ${{ secrets.RDS_DB }}
+      run: |
+        # Replace with your changelog deploy command, e.g. using Liquibase or Flyway
+        echo "Deploying changelog to RDS..."
+        # Example: liquibase update --url=jdbc:postgresql://${{ secrets.RDS_HOST }}:5432/${{ secrets.RDS_DB }} --username=${{ secrets.RDS_USER }} --password=${{ secrets.RDS_PASSWORD }}
+        //
