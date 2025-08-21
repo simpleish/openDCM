@@ -38,17 +38,18 @@ def create_liquibase_props(change_log_file, database_name, schema_name):
     port = os.environ.get("DB_PORT")
     driver = 'org.postgresql.Driver'
     classpath = 'external-jar/postgresql-42.6.0.jar'
-    search_path = 'changelog/'
+    search_path = 'liquibase-postgres-db/changelog'
 
     with open('liquibase.properties', 'w') as file:
         file.write('changeLogFile:' + change_log_file + '\n')
+        file.write('liquibase.searchPath: ' +  search_path + '\n')
         file.write('url: jdbc:postgresql://' + endpoint + ':' + port + '/' + database_name + '?currentSchema=' + schema_name + '\n')
         file.write('username: ' + username + '\n')
         file.write('password: ' + password + '\n')
         file.write('driver: ' + driver + '\n')
         file.write('classpath: ' + classpath + '\n')
-        file.write('liquibase.searchPath: ' +  search_path + '\n')
         file.write('liquibase.liquibaseSchemaName: ' + schema_name + '\n')
+        file.close()
 
 def run_migration():
     args = argument_parser()
