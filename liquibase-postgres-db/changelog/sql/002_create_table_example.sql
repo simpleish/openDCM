@@ -1,7 +1,5 @@
 --liquibase formatted sql
---changeset user:001-initial-schema
-
-CREATE SCHEMA IF NOT EXISTS app;
+--changeset user:simpleish
 
 CREATE TABLE IF NOT EXISTS app.example (
     id SERIAL PRIMARY KEY,
