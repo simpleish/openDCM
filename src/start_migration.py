@@ -68,19 +68,32 @@ def run_migration():
     log.info("EXECUTING update on database...")
     if rollback_opt == 'no':
         try:
-            liquibase = None
+            liquibase = Pyliquibase(defaultsFile="liquibase.properties",
+                                    logLevel="INFO")
+            # Liquibase execution
+            liquibase.validate()
+            liquibase.status()
+            liquibase.updateSQL()
+            liquibase.update()
+
+            # Liquibase maintainance commands
+            # <--- maintainanace commands will go here --->
+
         except Exception as e:
             raise Exception(
                 "Database migration ran into an unknown error: " + str(e)) 
     elif rollback_opt == 'yes':
-        pass
+        try:
+            liquibase = Pyliquibase(defaultsFile="liquibase.properties",
+                                    logLevel="INFO")
+            liquibase.rollback(args.tag)
+        except Exception as e:
+            raise Exception (
+                "Database rollback failed: " + str(e))
     else:
         raise Exception("Database migration failed because 'rollback_opt'\
                         had incorrect values. Accepted values are yes/no.")
 
 
-    
-
-
 if __name__ =='__main__':
-    pass
+    run_migration()
