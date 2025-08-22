@@ -6,28 +6,7 @@ import sys
 import os
 
 from pyliquibase import Pyliquibase
-
-# Create logging format
-formatter = logging.Formatter("%(asctime)s %(levelname)s - %(message)s")
-# Create print handler
-handler_print = logging.StreamHandler(sys.stdout)
-handler_print.setLevel(logging.INFO)
-handler_print.setFormatter(formatter)
-# Create logger
-log = logging.getLogger("migration_run_log")
-log.addHandler(handler_print)
-log.setLevel(logging.INFO)
-
-def argument_parser():
-    parser = argparse.ArgumentParser()
-
-    parser.add_argument("--dbname", help="Database to which DCM is applied")
-    parser.add_argument("--migration_schema", help="Schema to which liquibase DCM is to be applied")
-    parser.add_argument("rollback_opt", help="yes/no on the rollback action")
-    parser.add_argument("--tag", help="tag used for rollback and changeset")
-
-    args = parser.parse_args()
-    return args
+from src.logger import log
 
 def create_liquibase_props(change_log_file, database_name, schema_name):
     log.info("CREATING liquibase.properties file for deployment")
@@ -51,20 +30,21 @@ def create_liquibase_props(change_log_file, database_name, schema_name):
         file.write('liquibase.liquibaseSchemaName: ' + schema_name + '\n')
         file.close()
 
-def run_migration():
-    args = argument_parser()
+
+def run_migration(args: argparse.ArgumentParser):
+    # args = argument_parser()
 
     # Standard arguments 
     change_log_file_name = 'change_log_main.xml'
     db_name = args.dbname if hasattr(args, 'dbname') else 'initial'
-    mig_schema = args.migration_schema if hasattr(args, 'migration_schema') else 'base_schema'
+    migration_schema = args.migration_schema if hasattr(args, 'migration_schema') else 'base_schema'
     rollback_opt = str(args.rollback_opt).lower() if hasattr(args, 'rollback_opt') else 'no'
 
     # Create liquibase properties
     log.info("CREATING liquibase.properties for database migration...")
     create_liquibase_props(change_log_file=change_log_file_name, 
                            database_name=db_name,
-                           schema_name=mig_schema)
+                           schema_name=migration_schema)
     
     log.info("EXECUTING update on database...")
     if rollback_opt == 'no':
