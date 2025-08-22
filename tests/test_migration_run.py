@@ -13,19 +13,8 @@ import psycopg2
 import sqlalchemy
 from testcontainers.postgres import PostgresContainer
 
+from tests.logger import log
 from tests.liquibase_testing import perform_liquibase_testing
-
-# Create print handler
-handler_print = logging.StreamHandler(sys.stdout)
-# Set logging level for print handler
-handler_print.setLevel(logging.INFO)
-# Set formatting for print handler
-formatter = logging.Formatter("%(asctime)s %(levelname)s - %(message)s")
-handler_print.setFormatter(formatter)
-# Create logger
-log = logging.getLogger("test_migration_run_log")
-log.addHandler(handler_print)
-log.setLevel(logging.INFO)
 
 
 def start_postgres_container(db_name, username, password):
