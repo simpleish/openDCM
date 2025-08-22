@@ -20,7 +20,7 @@ handler_print = logging.StreamHandler(sys.stdout)
 # Set logging level for print handler
 handler_print.setLevel(logging.INFO)
 # Set formatting for print handler
-formatter = logging.Formatter("%(asctime)s %(levelname)s - %(messages)s")
+formatter = logging.Formatter("%(asctime)s %(levelname)s - %(message)s")
 handler_print.setFormatter(formatter)
 # Create logger
 log = logging.getLogger("test_migration_run_log")
@@ -43,7 +43,7 @@ def start_postgres_container(db_name, username, password):
 
     log.info("DB created for testing.")
     log.info("HOST: " + db_host)
-    log.info("PORT: " + db_port)
+    log.info("PORT: " + str(db_port))
     log.info("URL: " + db_url)
 
     return db_host, db_port, db_url
@@ -62,9 +62,9 @@ def create_testing_liquibase_properties(change_log_file,
     search_path = 'liquibase-postgres-db/changelog'
     
     with open('tests/liquibase.properties', 'w') as file:
-        file.write('changeLogFile:' + change_log_file + '\n')
+        file.write('changeLogFile: ' + change_log_file + '\n')
         file.write('liquibase.searchPath: ' +  search_path + '\n')
-        file.write('url: jdbc:postgresql://' + endpoint + ':' + db_port + '/' + db_name + '?currentSchema=' + schema_name + '\n')
+        file.write('url: jdbc:postgresql://' + endpoint + ':' + str(db_port) + '/' + db_name + '?currentSchema=' + schema_name + '\n')
         file.write('username: ' + username + '\n')
         file.write('password: ' + password + '\n')
         file.write('driver: ' + driver + '\n')
@@ -116,17 +116,17 @@ def start_migration_testing():
     schema_name = 'base_schema'
     username = 'admin'
     password = 'secret'
-    # db_host, db_port, db_url = '', '', ''
+    db_host, db_port, db_url = '', '', ''
 
     # Step 1
     log.info(f'STEP 1: Spawning container...')
     try:
-        db_host, db_port, db_url = start_postgres_container(dbname=db_name, 
-                                                            user_name=username, 
-                                                            pass_nm=password)
-    except Exception as E:
+        db_host, db_port, db_url = start_postgres_container(db_name=db_name, 
+                                                            username=username, 
+                                                            password=password)
+    except Exception as e:
         log.info(
-            "Error during initialization of postgres container " + str(e))
+            "Error during initialization of postgres container: " + str(e))
     
     if db_host == '' or db_port == '':
         raise Exception ("Something went wrong during container creation!")
@@ -134,7 +134,7 @@ def start_migration_testing():
     # Step 2
     log.info(f"STEP 2: Starting test migration for schema {schema_name}")
     
-    scripts_path = 'liquibase-postgres-migration/changelog/sql/'
+    scripts_path = 'liquibase-postgres-db/changelog/sql/'
     files = os.listdir(scripts_path)
 
     if files:
@@ -143,10 +143,10 @@ def start_migration_testing():
 
             # Create liquibase properties
             create_testing_liquibase_properties(change_log_file=change_log_file_name,
-                                                database_name=db_name,
+                                                db_name=db_name,
                                                 schema_name=schema_name,
-                                                host=db_host,
-                                                port=db_port,
+                                                db_host=db_host,
+                                                db_port=db_port,
                                                 username=username,
                                                 password=password)
             

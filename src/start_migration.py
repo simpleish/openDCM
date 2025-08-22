@@ -41,9 +41,9 @@ def create_liquibase_props(change_log_file, database_name, schema_name):
     search_path = 'liquibase-postgres-db/changelog'
 
     with open('liquibase.properties', 'w') as file:
-        file.write('changeLogFile:' + change_log_file + '\n')
+        file.write('changeLogFile: ' + change_log_file + '\n')
         file.write('liquibase.searchPath: ' +  search_path + '\n')
-        file.write('url: jdbc:postgresql://' + endpoint + ':' + port + '/' + database_name + '?currentSchema=' + schema_name + '\n')
+        file.write('url: jdbc:postgresql://' + endpoint + ':' + str(port) + '/' + database_name + '?currentSchema=' + schema_name + '\n')
         file.write('username: ' + username + '\n')
         file.write('password: ' + password + '\n')
         file.write('driver: ' + driver + '\n')

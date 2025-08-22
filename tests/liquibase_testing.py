@@ -5,8 +5,7 @@ from pyliquibase import Pyliquibase
 def perform_liquibase_testing():
     try:
         liquibase = Pyliquibase(defaultsFile="tests/liquibase.properties",
-                                jdbcDriversDir='external-jar',
-                                logLevel='INFO')
+                                jdbcDriversDir='external-jar')
         # Call execute with arguments
         liquibase.execute("status")
         # liquibase.execute("rollback", "MyTag")
