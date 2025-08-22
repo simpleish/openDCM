@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: liquibase
+      POSTGRES_PASSWORD: liquibase
+      POSTGRES_DB: liquibase_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  liquibase:
+    image: liquibase/liquibase:latest
+    environment:
+      LIQUIBASE_URL: jdbc:postgresql://postgres:5432/liquibase_db
+      LIQUIBASE_USERNAME: liquibase
+      LIQUIBASE_PASSWORD: liquibase
+    volumes:
+      - ./changelogs:/liquibase/changelogs
+      - ./liquibase.properties:/liquibase/liquibase.properties
+    depends_on:
+      - postgres
+    command: ["update"]
+
+volumes:
+  postgres_data:

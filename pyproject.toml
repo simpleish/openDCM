@@ -1,0 +1,24 @@
+[project]
+name = "opendcm"
+version = "0.1.0"
+description = "Database change management (DCM) reuse patters with PostgresDB and liquibase"
+authors = [
+    {name = "rakshitraj",email = "rakshit3181@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12, <3.13"
+dependencies = [
+    "pyliquibase (>=2.4.0,<3.0.0)",
+    "testcontainers (>=4.12.0,<5.0.0)",
+    "boto3 (>=1.40.14,<2.0.0)",
+    "botocore (>=1.40.14,<2.0.0)",
+    "pytest (>=8.4.1,<9.0.0)",
+    "setuptools (>=80.9.0,<81.0.0)",
+    "psycopg2-binary (>=2.9.10,<3.0.0)",
+    "sqlalchemy (>=2.0.43,<3.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
