@@ -170,4 +170,12 @@ def start_migration_testing():
             exit(e)
 
         log.info('FINISHED runnning liquibase!')
-        
+
+
+class TestMigration(TestCase):
+    def test_migration_run(self):
+        self.assertEqual(start_migration_testing(), None)
+
+
+if __name__ == '__main__':
+    unittest.main()
