@@ -1,0 +1,93 @@
+name: Database Change Management
+
+on:
+  push:
+    paths-ignore:
+        - README.md
+        - LICENSE
+        - .gitignore
+        - .github/**
+  pull_request_target:
+    branches:
+      - main
+      - dev
+    types:
+      - closed
+
+permissions: write-all
+
+jobs:
+  setenv:
+    name: SETENV
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide the environment
+        id: gitenv
+        run: |
+            if [ ${{ github.ref }} ] == "refs/heads/qa" ]; then
+              envname='qa'
+            else
+              envname='dev'
+            fi
+            echo "Using environment $envname"
+            echo "env_name=$envname" >> $GITHUB_OUTPUT 
+    outputs:
+      EnvironmentName: ${{ steps.gitenv.outputs.env_name }}
+        
+  test:
+    needs: setenv
+    environment:
+      name: ${{ needs.setenv.outputs.EnvironmentName }}
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.pull_request.merged == true }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Required due to the way Git works, without it this action won't be able to find any or the correct tags
+          
+      - name: Collect the branch name
+        run: |
+          gitbranch=`echo ${{ github.ref }} | awk -F/ '{print $NF}'`
+          if [ $gitbranch == "main" ]; then
+            gitbranch="prod"
+          fi
+          echo "branchname=$gitbranch" >> $GITHUB_ENV
+
+      - run: echo "The current branch in use is ${{ env.branchname }}"
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Cache Poetry and pip
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/pypoetry
+            ~/.cache/pip
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/pyproject.toml') }}-py3.12
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Poetry
+        run: |
+          curl -sSL https://install.python-poetry.org | python3 -
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+          poetry --version
+
+      - name: Configure Poetry
+        run: |
+          poetry config virtualenvs.create false --local
+
+      - name: Install dependencies
+        run: |
+          poetry install --no-interaction --no-ansi
+
+      - name: Run tests
+        run: |
+          poetry run pytest -q
+      
+  
