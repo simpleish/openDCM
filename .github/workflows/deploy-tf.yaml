@@ -1,0 +1,31 @@
+name: "Terraform AWS"
+
+on:
+  pull_request:
+    branches:
+      - main
+
+  push:
+    paths:
+      - 'feature/main.tf'
+      - 'fix/main.tf'
+
+jobs:
+  setenv:
+    name: SETENV
+    runs-on: ubuntu-latest
+    outputs:
+      EnvironmentName: ${{ steps.gitenv.outputs.env_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Decide the environment
+        id: gitenv
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/qa" ]; then
+            envname='qa'
+          else
+            envname='dev'
+          fi
+          echo "Using environment $envname"
+          echo "env_name=$envname" >> $GITHUB_OUTPUT
