@@ -100,7 +100,7 @@ jobs:
         uses: dariocurr/pytest-summary@main
         with:
           paths: tests/**.py
-          options: --vv -s
+          options: -vv -s
           show: "fail, skip"
 
       - name: Upload test summary

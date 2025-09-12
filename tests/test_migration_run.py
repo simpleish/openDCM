@@ -1,20 +1,14 @@
 """ This is not a unit-test for run_migration fn, but an application test for hte whole app """
 
-import multiprocessing
 import unittest
 from unittest import TestCase
 
-import asyncio
-import logging
 import subprocess
-import sys
 import os.path
 import psycopg2
 import sqlalchemy
 from testcontainers.postgres import PostgresContainer
-
 from tests.logger import log
-from tests.liquibase_testing import perform_liquibase_testing
 
 
 def start_postgres_container(db_name, username, password):
@@ -28,7 +22,7 @@ def start_postgres_container(db_name, username, password):
     db_url = postgres_container.get_connection_url()
     db_port = postgres_container.get_exposed_port(5432)
     db_host = postgres_container.get_container_host_ip()
-    e = sqlalchemy.create_engine(postgres_container.get_connection_url())
+    sqlalchemy.create_engine(postgres_container.get_connection_url())
 
     log.info("DB created for testing.")
     log.info("HOST: " + db_host)
@@ -108,7 +102,7 @@ def start_migration_testing():
     db_host, db_port, db_url = '', '', ''
 
     # Step 1
-    log.info(f'STEP 1: Spawning container...')
+    log.info('STEP 1: Spawning container...')
     try:
         db_host, db_port, db_url = start_postgres_container(db_name=db_name, 
                                                             username=username, 

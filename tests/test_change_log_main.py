@@ -1,7 +1,5 @@
-import sys
 import unittest
 import xml.etree.ElementTree as ET
-import logging
 
 from tests.logger import log
 
