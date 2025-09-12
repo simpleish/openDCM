@@ -96,18 +96,8 @@ jobs:
           ruff check .
         continue-on-error: true
 
-      - name: Run pytests
-        uses: dariocurr/pytest-summary@main
-        with:
-          paths: tests/**.py
-          options: -vv -s
-          show: "fail, skip"
-
-      - name: Upload test summary
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-summary
-          path: test-summary.md
-        if: always()
-            
+      - name: Run pytest
+        run: |
+          poetry run pytest -v -s
+          
   

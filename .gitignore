@@ -1,6 +1,9 @@
 # IDE files
 .vscode/settings.json
 
+# liquibase properties
+liquibase.properties
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

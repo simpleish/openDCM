@@ -2,7 +2,6 @@
 
 import unittest
 from unittest import TestCase
-
 import subprocess
 import os.path
 import psycopg2
