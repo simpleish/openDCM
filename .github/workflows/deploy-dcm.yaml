@@ -62,32 +62,52 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Cache Poetry and pip
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.cache/pypoetry
-            ~/.cache/pip
-          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/pyproject.toml') }}-py3.12
-          restore-keys: |
-            ${{ runner.os }}-poetry-
-
-      - name: Install Poetry
+      - name: Install poetry
         run: |
           curl -sSL https://install.python-poetry.org | python3 -
           echo "$HOME/.local/bin" >> $GITHUB_PATH
           poetry --version
 
-      - name: Configure Poetry
+      - name: Configure poetry
         run: |
-          poetry config virtualenvs.create false --local
+          poetry config virtualenvs.create true --local
+          poetry config virtualenvs.in-project true --local
+          poetry config virtualenvs.path .venv
 
-      - name: Install dependencies
+      - name: Load cached .venv
+        id: cached-poetry-dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.venv
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}-${{ hashFiles('**/pyproject.toml') }}-py3.12
+          restore-keys: |
+            ${{ runner.os }}-poetry-
+
+      - name: Install Dependencies
+        if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
         run: |
           poetry install --no-interaction --no-ansi --no-root
 
-      - name: Run tests
+      - name: Lint with ruff
         run: |
-          poetry run pytest -q
-      
+          source .venv/bin/activate
+          pip install ruff
+          ruff check .
+        continue-on-error: true
+
+      - name: Run pytests
+        uses: dariocurr/pytest-summary@main
+        with:
+          paths: tests/**.py
+          options: --vv -s
+          show: "fail, skip"
+
+      - name: Upload test summary
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-summary
+          path: test-summary.md
+        if: always()
+            
   
