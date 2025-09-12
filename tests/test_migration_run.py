@@ -95,7 +95,7 @@ def initialize_database(db_name, username, password, db_host, db_port, schema_na
 def start_migration_testing():
     change_log_file_name = 'change_log_main.xml'
     db_name = 'initial'
-    schema_name = 'base_schema'
+    schema_name = 'public'
     username = 'admin'
     password = 'secret'
     db_host, db_port, db_url = '', '', ''

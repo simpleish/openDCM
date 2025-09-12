@@ -33,7 +33,7 @@ def run_migration(args: argparse.ArgumentParser):
     # Standard arguments 
     change_log_file_name = 'change_log_main.xml'
     db_name = args.dbname if hasattr(args, 'dbname') else 'initial'
-    migration_schema = args.migration_schema if hasattr(args, 'migration_schema') else 'base_schema'
+    migration_schema = args.migration_schema if hasattr(args, 'migration_schema') else 'public'
     rollback_opt = str(args.rollback_opt).lower() if hasattr(args, 'rollback_opt') else 'no'
 
     # Create liquibase properties
